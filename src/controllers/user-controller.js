@@ -35,13 +35,7 @@ async function store(req, res) {
             password: req.body.password,
             role: req.body.role_id
         });
-        await Role.updateOne({
-            '_id': user.role
-        }, {
-            $push: {
-                users: user._id
-            }
-        });
+        await user.syncRole();
         res.send(success('User created.', {
             user: user
         }));
@@ -58,26 +52,8 @@ async function update(req, res) {
         user.mobile = req.body.mobile;
         req.body.status ? user.status = req.body.status : null;
         req.body.password ? user.password = req.body.password : null;
-        if (req.body.role_id) {
-            await Role.updateOne({
-                '_id': user.role
-            }, {
-                $pull: {
-                    users: user._id
-                }
-            });
-            user.role = req.body.role_id;
-        }
         await user.save();
-        if (req.body.role_id) {
-            await Role.updateOne({
-                '_id': user.role
-            }, {
-                $push: {
-                    users: user._id
-                }
-            });
-        }
+        await user.syncRole();
         res.send(success('User updated.', {
             user: user
         }));
@@ -89,21 +65,11 @@ async function update(req, res) {
 async function destroy(req, res) {
     try {
         const user = await User.findById(req.params.id);
-        if (!user) {
-            res.status(400).send(failed('User not found.', {}));
-        } else {
-            await user.remove();
-            await Role.updateOne({
-                '_id': user.role
-            }, {
-                $pull: {
-                    users: user._id
-                }
-            });
-            res.send(success('User deleted.', {
-                user: user
-            }));
-        }
+        await user.remove();
+        await user.detachRole();
+        res.send(success('User deleted.', {
+            user: user
+        }));
     } catch (error) {
         res.send(failed('Something went wrong.', error));
     }

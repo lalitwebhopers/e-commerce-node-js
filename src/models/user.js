@@ -1,4 +1,5 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const Role = require('./role');
 
 const UserSchema = mongoose.Schema({
     name: {
@@ -33,6 +34,35 @@ const UserSchema = mongoose.Schema({
 }, {
     timestamps: true
 });
+
+UserSchema.methods.syncRole = async function () {
+    await Role.updateMany({
+        users: this._id
+    }, {
+        $pull: {
+            users: this._id
+        }
+    });
+    await Role.updateMany({
+        '_id': this.role
+    }, {
+        $push: {
+            users: this._id
+        }
+    });
+    return true;
+}
+
+UserSchema.methods.detachRole = async function () {
+    await Role.updateMany({
+        users: this._id
+    }, {
+        $pull: {
+            users: this._id
+        }
+    });
+    return true;
+}
 
 const User = mongoose.model('User', UserSchema);
 
