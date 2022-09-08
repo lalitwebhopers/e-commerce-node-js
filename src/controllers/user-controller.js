@@ -2,10 +2,6 @@ const User = require("../models/user");
 
 const success = require('../responses/success')
 const failed = require('../responses/failed');
-const Role = require("../models/role");
-const {
-    arrayDifference
-} = require("../helpers/array");
 
 async function index(req, res) {
     try {
