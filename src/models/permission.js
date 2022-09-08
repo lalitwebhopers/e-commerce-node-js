@@ -17,11 +17,13 @@ const PermissionSchema = mongoose.Schema({
     },
     roles: [{
         type: mongoose.Types.ObjectId,
-        ref: 'Role'
+        ref: 'Role',
+        unique: true
     }]
 }, {
     timestamps: true
 });
+
 
 const Permission = mongoose.model('Permission', PermissionSchema);
 

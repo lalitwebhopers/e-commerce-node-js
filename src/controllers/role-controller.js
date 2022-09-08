@@ -2,7 +2,6 @@ const Role = require("../models/role");
 
 const success = require('../responses/success')
 const failed = require('../responses/failed');
-const Permission = require("../models/permission");
 
 async function index(req, res) {
     try {
@@ -25,13 +24,7 @@ async function index(req, res) {
 async function store(req, res) {
     try {
         const role = await Role.create(req.body);
-        await Permission.updateMany({
-            '_id': role.permissions
-        }, {
-            $push: {
-                roles: role._id
-            }
-        });
+        await role.syncPermissions();
         res.send(success('Role created.', {
             role: role
         }));
@@ -42,11 +35,11 @@ async function store(req, res) {
 
 async function update(req, res) {
     try {
+        await Role.updateOne({
+            '_id': req.params.id
+        }, req.body);
         const role = await Role.findById(req.params.id);
-        role.name = req.body.name;
-        role.title = req.body.title;
-        req.body.status ? role.status = req.body.status : null;
-        await role.save();
+        await role.syncPermissions();
         res.send(success('Role updated.', {
             role: role
         }));
@@ -57,10 +50,9 @@ async function update(req, res) {
 
 async function destroy(req, res) {
     try {
-        const role = await Role.findByIdAndDelete(req.params.id);
-        if (!role) {
-            res.status(400).send(failed('Role not found.', {}));
-        }
+        const role = await Role.findById(req.params.id);
+        await role.datachPermissions();
+        await role.remove();
         res.send(success('Role deleted.', {
             role: role
         }));

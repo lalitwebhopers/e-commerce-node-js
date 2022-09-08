@@ -1,4 +1,5 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const Permission = require('./permission');
 
 const RoleSchema = mongoose.Schema({
     name: {
@@ -19,15 +20,49 @@ const RoleSchema = mongoose.Schema({
     },
     users: [{
         type: mongoose.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        unique: true
     }],
     permissions: [{
         type: mongoose.Types.ObjectId,
-        ref: 'Permission'
+        ref: 'Permission',
+        unique: true
     }]
 }, {
     timestamps: true
 });
+
+RoleSchema.methods.syncPermissions = async function () {
+    // detach old permissions
+    await Permission.updateMany({
+        roles: this._id
+    }, {
+        $pull: {
+            roles: this._id
+        }
+    });
+    // attach new permissions
+    await Permission.updateMany({
+        '_id': this.permissions
+    }, {
+        $push: {
+            roles: this._id
+        }
+    });
+    return true;
+}
+
+RoleSchema.methods.datachPermissions = async function () {
+    // detach old permissions
+    await Permission.updateMany({
+        roles: this._id
+    }, {
+        $pull: {
+            roles: this._id
+        }
+    });
+    return true;
+}
 
 const Role = mongoose.model('Role', RoleSchema);
 

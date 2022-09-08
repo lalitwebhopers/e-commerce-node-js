@@ -4,7 +4,9 @@ const validationFailed = require('../../responses/validationFailed')
 
 const UpdateRoleSchema = Joi.object({
     name: Joi.string().required(),
-    title: Joi.string().required()
+    title: Joi.string().required(),
+    status: Joi.string(),
+    permissions: Joi.array().required()
 });
 
 async function updateRoleRequest(req, res, next) {
