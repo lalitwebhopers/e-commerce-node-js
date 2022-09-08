@@ -8,7 +8,7 @@ const UpdateRoleSchema = Joi.object({
     mobile: Joi.string(),
     password: Joi.string(),
     status: Joi.string(),
-    role_id: Joi.string()
+    role: Joi.string()
 });
 
 async function updateRoleRequest(req, res, next) {

@@ -20,13 +20,11 @@ const RoleSchema = mongoose.Schema({
     },
     users: [{
         type: mongoose.Types.ObjectId,
-        ref: 'User',
-        unique: true
+        ref: 'User'
     }],
     permissions: [{
         type: mongoose.Types.ObjectId,
-        ref: 'Permission',
-        unique: true
+        ref: 'Permission'
     }]
 }, {
     timestamps: true

@@ -17,8 +17,7 @@ const PermissionSchema = mongoose.Schema({
     },
     roles: [{
         type: mongoose.Types.ObjectId,
-        ref: 'Role',
-        unique: true
+        ref: 'Role'
     }]
 }, {
     timestamps: true

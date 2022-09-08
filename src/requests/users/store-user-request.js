@@ -8,7 +8,7 @@ const StoreUserSchema = Joi.object({
     mobile: Joi.string().required(),
     password: Joi.string().required(),
     status: Joi.string().required(),
-    role_id: Joi.string().required()
+    role: Joi.string().required()
 });
 
 async function storeUserRequest(req, res, next) {

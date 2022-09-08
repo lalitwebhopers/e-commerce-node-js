@@ -27,14 +27,7 @@ async function index(req, res) {
 
 async function store(req, res) {
     try {
-        const user = await User.create({
-            name: req.body.name,
-            email: req.body.email,
-            mobile: req.body.mobile,
-            status: req.body.status,
-            password: req.body.password,
-            role: req.body.role_id
-        });
+        const user = await User.create(req.body);
         await user.syncRole();
         res.send(success('User created.', {
             user: user
@@ -46,13 +39,10 @@ async function store(req, res) {
 
 async function update(req, res) {
     try {
+        await User.updateOne({
+            '_id': req.params.id
+        }, req.body);
         const user = await User.findById(req.params.id);
-        user.name = req.body.name;
-        user.email = req.body.email;
-        user.mobile = req.body.mobile;
-        req.body.status ? user.status = req.body.status : null;
-        req.body.password ? user.password = req.body.password : null;
-        await user.save();
         await user.syncRole();
         res.send(success('User updated.', {
             user: user

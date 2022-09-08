@@ -36,6 +36,7 @@ const UserSchema = mongoose.Schema({
 });
 
 UserSchema.methods.syncRole = async function () {
+
     await Role.updateMany({
         users: this._id
     }, {
